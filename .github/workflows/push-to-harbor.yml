@@ -17,10 +17,11 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -f -N -R 5000:localhost:5000 muska@192.168.56.1
+          # Make sure SSH allows remote port forwarding, using -f to background it.
+          ssh -o StrictHostKeyChecking=no -f -N -R 5000:localhost:5000 muska@192.168.56.1
+          # You might want to test if the SSH tunnel is working:
+          sleep 5
 
       - name: Log in to Harbor
-        run: curl --fail -v http://localhost:5000/run-playwright || echo "Failed to trigger Playwright"
-
-      - name: Build Docker Image
-        run: docker pull nginx
+        run: |
+          curl --fail -v http://localhost:5000/run-playwright || echo "Failed to trigger Playwright"
